@@ -25,11 +25,23 @@ class Data:
         self.update()
 
     def update(self):
-
         self.df.drop(self.df.index, inplace=True)
         self.df = pd.DataFrame(data={})
+
+        # Multithreading helps a lot here.
+        # ~ 2.717305s - with multithreading
+        # ~ 18.856571s - without multithreading
+        # still very slow though
+        print("Downloading data...")
+
+        threads = list()
         for nuts in NUTS:
-            self.__fetch_data(nuts)
+            x = threading.Thread(target=self.__fetch_data, args=(nuts,))
+            threads.append(x)
+            x.start()
+
+        for index, thread in enumerate(threads):
+            thread.join()
 
     def __fetch_data(self, nuts):
 
