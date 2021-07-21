@@ -16,8 +16,7 @@
 
 import datetime
 import getopt, sys
-import data
-
+from app import *
 def main(argv):
    # Remove 1st argument from the
    # list of command line arguments
@@ -49,10 +48,8 @@ def main(argv):
       # output error, and return with an error code
       print(str(err))
 
-   start = datetime.datetime.now()
-   d = data.Data()
-   print(datetime.datetime.now() - start)
-
+   a = App()
+   a.run()
 
 if __name__ == "__main__":
    main(sys.argv[1:])
