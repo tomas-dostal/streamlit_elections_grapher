@@ -23,6 +23,9 @@ class States(Enum):
     NO_OPTIONS = 6
 
 
+def clear():
+    return os.system('clear')
+
 NUTS = (
     "CZ0100", "CZ0201", "CZ0202", "CZ0203", "CZ0204", "CZ0205", "CZ0206", "CZ0207", "CZ0208", "CZ0209", "CZ0311",
     "CZ0312",

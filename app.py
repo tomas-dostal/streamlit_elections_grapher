@@ -29,8 +29,6 @@ class App:
         #   - return to start
         #   - exit
 
-        def clear():
-            return os.system('clear')
 
         current_state = States.UPDATE_DATA
         next_state = States.SEARCH
