@@ -10,11 +10,7 @@ class Data:
 
         self.df = pd.DataFrame(data={})
         # https://volby.cz/pls/ps2017nss/vysledky_okres?nuts=CZ0806
-
         self.update()
-
-    def __add_to_dataframe(self, x):
-        self.df = self.df.append(x)
 
     def update(self):
         self.df.drop(self.df.index, inplace=True)
@@ -33,7 +29,11 @@ class Data:
         [self.__add_to_dataframe(res.get(timeout=10))
          for res in multiple_results]
 
-        print("{} entries imported".format(len(self.df)))
+        print("\n{} entries imported".format(len(self.df)))
+
+    def __add_to_dataframe(self, x):
+        print("#", end="")
+        self.df = self.df.append(x)
 
     def __fetch_data(self, nuts):
 

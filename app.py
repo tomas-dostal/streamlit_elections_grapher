@@ -7,6 +7,7 @@ from termgraph import termgraph as tg
 from helper import map_range_from_to
 from helper import get_terminal_size
 from helper import States
+from helper import clear
 
 
 class App:
@@ -37,6 +38,7 @@ class App:
         while True:
             if current_state == States.SEARCH:
                 clear()
+                offset = 0
                 print("Elections grapher")
                 # if not argument in console:
                 if not location:
@@ -134,22 +136,26 @@ class App:
 
             elif current_state == States.MULTIPLE_OPTIONS:
                 clear()
-                print(
-                    "Multiple possibilities for input '{}', please specify: ".format(place))
-                show_options = min(len(options), 9)
+                print("Multiple possibilities for input '{}', please specify: ".format(place))
+                show_options = min(len(options), 15)
 
-                options_str = ["{} [{}]".format(options.iloc[i]["city_name"], options.iloc[i]["district_name"]) for i in
-                               range(0, show_options)] + ["Search again", "Exit"]
+                options_str = ["{} [{}]"
+                                   .format(options.iloc[i]["city_name"], options.iloc[i]["district_name"]) for i in
+                               range(offset + 0, min(offset + show_options, len(options)))] + ["|= More", "|= Search again", "|= Exit"]
 
                 multiple_options = TerminalMenu(
                     options_str
                 )
                 view_index = multiple_options.show()
-                if view_index == (show_options - 1) + 2:
+                if view_index == (show_options - 1) + 3:
                     exit(0)
-                elif view_index == (show_options - 1) + 1:
+                elif view_index == (show_options - 1) + 2:
                     location = None  # clear location I got from command line
                     next_state = States.SEARCH
+                elif view_index == (show_options - 1) + 1:  # move to "next page"
+                    if(offset + show_options) < len(options):
+                        offset += show_options
+                    next_state = States.MULTIPLE_OPTIONS
                 else:
                     votes = self.d.get_votes_by_city_id(
                         int(options.iloc[view_index]["city_id"]))
