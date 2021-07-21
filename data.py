@@ -1,8 +1,6 @@
 import pandas as pd
 import xmltodict
 import requests
-import threading
-import os
 
 NUTS = (
     "CZ0100", "CZ0201", "CZ0202", "CZ0203", "CZ0204", "CZ0205", "CZ0206", "CZ0207", "CZ0208", "CZ0209", "CZ0311",
@@ -53,6 +51,8 @@ PARTIES = {
     "30": "SPO",
     "31": "NáS"
 }
+from multiprocessing.pool import ThreadPool
+from helper import *
 
 
 class Data:
@@ -62,6 +62,9 @@ class Data:
         # https://volby.cz/pls/ps2017nss/vysledky_okres?nuts=CZ0806
 
         self.update()
+
+    def __add_to_dataframe(self, x):
+        self.df = self.df.append(x)
 
     def update(self):
         self.df.drop(self.df.index, inplace=True)
@@ -73,14 +76,10 @@ class Data:
         # still very slow though
         print("Downloading data...")
 
-        threads = list()
-        for nuts in NUTS:
-            x = threading.Thread(target=self.__fetch_data, args=(nuts,))
-            threads.append(x)
-            x.start()
-
-        for index, thread in enumerate(threads):
-            thread.join()
+        pool = ThreadPool(processes=32)
+        # launching multiple evaluations asynchronously may use more processes
+        multiple_results = [pool.apply_async(Data.__fetch_data, (self, nuts)) for nuts in NUTS]
+        [self.__add_to_dataframe(res.get(timeout=10)) for res in multiple_results]
 
         print("{} entries imported".format(len(self.df)))
 
@@ -88,17 +87,16 @@ class Data:
 
         url = "https://volby.cz/pls/ps2017nss/vysledky_okres?nuts={}".format(nuts)
         r = requests.get(url, allow_redirects=True)
-        if r.status_code == 200:
-            print('{} OK!'.format(nuts))
-        else:
-            while r.status_code != 200:
-                r = requests.get(url, allow_redirects=True)
-                print('Retrying {}!'.format(nuts))
+
+        while r.status_code != 200:
+            r = requests.get(url, allow_redirects=True)
+            print('Retrying {}!'.format(nuts))
 
         filename = '{}.xml'.format(nuts)
         open(filename, 'wb').write(r.content)
 
-        tmp_data = []  # performing concat once finished is cheaper that an appeind in for cycle
+        tmp_data = []  # performing concat once finished is cheaper that an append in foreach
+
         with open(filename) as xml_file:
             data_dict = xmltodict.parse(xml_file.read())
             res = data_dict.get("VYSLEDKY_OKRES")
@@ -111,7 +109,6 @@ class Data:
                     tmp_data.append(
                         {
                             'district_name': district["@NAZ_OKRES"],
-                            # 'nuts_code': district["@NUTS_OKRES"],
                             'city_id': city["@CIS_OBEC"],
                             'city_name': city["@NAZ_OBEC"],
                             'party': party["@KSTRANA"],
@@ -121,16 +118,13 @@ class Data:
                     )
 
         os.remove(filename)
-
-        # Finally save everything to the Pandas DataFrame
-        # self.df. = pd.DataFrame(list(tmp_data.items()), columns=['district_name', 'city_name', 'party_id', 'party_votes_percent', 'total_votes'])
-
-        self.df = self.df.append(tmp_data)
+        # need to add to pandas in the main thread
+        return tmp_data
 
     def find_places_by_name(self, qu):
         # qu = "nová ves"
-        res = self.df.loc[self.df['city_name'].str.startswith(qu)] # todo: make it case insensitive
-        #res = self.df.loc[str.lower(self.df['city_name'].str).contains(qu, case=False)]
+        res = self.df.loc[self.df['city_name'].str.startswith(qu)]  # todo: make it case insensitive
+        # res = self.df.loc[str.lower(self.df['city_name'].str).contains(qu, case=False)]
         options = res[["city_id", "city_name", "district_name"]].drop_duplicates()
 
         return options
