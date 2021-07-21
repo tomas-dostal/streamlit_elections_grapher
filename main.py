@@ -15,7 +15,8 @@
 #
 import argparse
 import datetime
-import getopt, sys
+import getopt
+import sys
 from app import *
 
 
@@ -24,9 +25,12 @@ def main(args):
     a = App()
     a.run(location=args.place)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--place', help="Specify target city/village by name to view election charts")
-    parser.add_argument('-s', '--streamlit', help="Run application in the streamlit mode") # todo
+    parser.add_argument(
+        '-p', '--place', help="Specify target city/village by name to view election charts")
+    parser.add_argument('-s', '--streamlit',
+                        help="Run application in the streamlit mode")  # todo
     args = parser.parse_args()
     main(args)

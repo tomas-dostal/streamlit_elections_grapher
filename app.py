@@ -1,13 +1,12 @@
 import os
 import datetime
-from enum import Enum
 from data import Data
 from data import PARTIES
 from simple_term_menu import TerminalMenu
 from termgraph import termgraph as tg
 from helper import map_range_from_to
 from helper import get_terminal_size
-
+from helper import States
 
 
 class App:
@@ -29,7 +28,8 @@ class App:
         #   - return to start
         #   - exit
 
-        clear = lambda: os.system('clear')
+        def clear():
+            return os.system('clear')
 
         current_state = States.UPDATE_DATA
         next_state = States.SEARCH
@@ -66,14 +66,14 @@ class App:
                 if len(options) > 1:
                     next_state = States.MULTIPLE_OPTIONS
                 elif len(options) == 1:
-                    votes = self.d.get_votes_by_city_id(int(options["city_id"]))
+                    votes = self.d.get_votes_by_city_id(
+                        int(options["city_id"]))
                     if location:
                         next_state = States.MULTIPLE_OPTIONS
                     else:
                         next_state = States.VIEW_GRAPH
                 else:
                     next_state = States.NO_OPTIONS
-
 
             elif current_state == States.VIEW_GRAPH:
                 # party names
@@ -82,18 +82,22 @@ class App:
                                                                     votes.iloc[0]["district_name"]))
                 print("------------------------------------")
                 # change to parties names
-                involved_parties_color = [int(x) + 80 for x in list(votes["party"])]
-                involved_parties = votes["party"].replace(PARTIES)  # replace ID by NAME
+                involved_parties_color = [
+                    int(x) + 80 for x in list(votes["party"])]
+                involved_parties = votes["party"].replace(
+                    PARTIES)  # replace ID by NAME
                 labels = list(involved_parties)
 
-                percents = [float(x) for x in list(votes["party_votes_percent"])]
+                percents = [float(x)
+                            for x in list(votes["party_votes_percent"])]
                 # no every party candidated in specific region.
                 # parties_names = map(PARTIES.get, place["party_id"].values.tolist())
                 # place["party/"]
                 data = [[x] for x in percents]
 
                 # let's scale graph according to the current width of terminal.
-                normal_data = [[map_range_from_to((x), 0, 100, 0, get_terminal_size())] for x in percents]
+                normal_data = [
+                    [map_range_from_to((x), 0, 100, 0, get_terminal_size())] for x in percents]
                 len_categories = 1
                 args = {
                     'filenam': 'data/ex4.dat',
@@ -116,7 +120,8 @@ class App:
                     'verbose': True,
                     'version': False
                 }
-                tg.stacked_graph(labels, data, normal_data, len_categories, args, involved_parties_color)
+                tg.stacked_graph(labels, data, normal_data,
+                                 len_categories, args, involved_parties_color)
 
                 multiple_options = TerminalMenu(
                     ["Search again", "Exit"]
@@ -129,7 +134,8 @@ class App:
 
             elif current_state == States.MULTIPLE_OPTIONS:
                 clear()
-                print("Multiple possibilities for input '{}', please specify: ".format(place))
+                print(
+                    "Multiple possibilities for input '{}', please specify: ".format(place))
                 show_options = min(len(options), 9)
 
                 options_str = ["{} [{}]".format(options.iloc[i]["city_name"], options.iloc[i]["district_name"]) for i in
@@ -145,7 +151,8 @@ class App:
                     location = None  # clear location I got from command line
                     next_state = States.SEARCH
                 else:
-                    votes = self.d.get_votes_by_city_id(int(options.iloc[view_index]["city_id"]))
+                    votes = self.d.get_votes_by_city_id(
+                        int(options.iloc[view_index]["city_id"]))
                     next_state = States.VIEW_GRAPH
 
             elif current_state == States.NO_OPTIONS:

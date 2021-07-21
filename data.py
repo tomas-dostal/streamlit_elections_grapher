@@ -28,14 +28,17 @@ class Data:
 
         pool = ThreadPool(processes=32)
         # launching multiple evaluations asynchronously may use more processes
-        multiple_results = [pool.apply_async(Data.__fetch_data, (self, nuts)) for nuts in NUTS]
-        [self.__add_to_dataframe(res.get(timeout=10)) for res in multiple_results]
+        multiple_results = [pool.apply_async(
+            Data.__fetch_data, (self, nuts)) for nuts in NUTS]
+        [self.__add_to_dataframe(res.get(timeout=10))
+         for res in multiple_results]
 
         print("{} entries imported".format(len(self.df)))
 
     def __fetch_data(self, nuts):
 
-        url = "https://volby.cz/pls/ps2017nss/vysledky_okres?nuts={}".format(nuts)
+        url = "https://volby.cz/pls/ps2017nss/vysledky_okres?nuts={}".format(
+            nuts)
         r = requests.get(url, allow_redirects=True)
 
         while r.status_code != 200:
@@ -73,9 +76,11 @@ class Data:
 
     def find_places_by_name(self, qu):
         # qu = "nová ves"
-        res = self.df.loc[self.df['city_name'].str.startswith(qu)]  # todo: make it case insensitive
+        # todo: make it case insensitive
+        res = self.df.loc[self.df['city_name'].str.startswith(qu)]
         # res = self.df.loc[str.lower(self.df['city_name'].str).contains(qu, case=False)]
-        options = res[["city_id", "city_name", "district_name"]].drop_duplicates()
+        options = res[["city_id", "city_name",
+                       "district_name"]].drop_duplicates()
 
         return options
 
