@@ -3,21 +3,11 @@ import datetime
 from enum import Enum
 from data import Data
 from data import PARTIES
-import pandas as pd
 from simple_term_menu import TerminalMenu
 from termgraph import termgraph as tg
-from numpy import interp
 from helper import map_range_from_to
 from helper import get_terminal_size
 
-
-class States(Enum):
-    SEARCH = 1
-    UPDATE_DATA = 2
-    STATUS = 3
-    VIEW_GRAPH = 4
-    MULTIPLE_OPTIONS = 5
-    NO_OPTIONS = 6
 
 
 class App:
