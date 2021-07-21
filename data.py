@@ -12,7 +12,15 @@ class Data:
         # https://volby.cz/pls/ps2017nss/vysledky_okres?nuts=CZ0806
         self.update()
 
+    # another approach would be having an index of what cities/towns are in NUTS and then
+    # download only needed data.
+
     def update(self):
+
+        # It there was a change, then without a diff it is cheaper (and much faster) to delete everything
+        # and extract again.
+        # possible improvements: Keep hashes of already downloaded files.
+        # If newly downloaded file has the same hash, I don't need to extract it
         self.df.drop(self.df.index, inplace=True)
         self.df = pd.DataFrame(data={})
 

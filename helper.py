@@ -8,7 +8,7 @@ def map_range_from_to(val, in_min, in_max, out_min, out_max):
 
 def get_terminal_size():
     try:
-        return os.get_terminal_size()[0]
+        return os.get_terminal_size()[0] * 2
     # output is most likely redirected to an IDE
     except OSError as e:
         return 100
