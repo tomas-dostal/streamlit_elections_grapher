@@ -67,7 +67,10 @@ class App:
                     next_state = States.MULTIPLE_OPTIONS
                 elif len(options) == 1:
                     votes = self.d.get_votes_by_city_id(int(options["city_id"]))
-                    next_state = States.VIEW_GRAPH
+                    if location:
+                        next_state = States.MULTIPLE_OPTIONS
+                    else:
+                        next_state = States.VIEW_GRAPH
                 else:
                     next_state = States.NO_OPTIONS
 
@@ -139,6 +142,7 @@ class App:
                 if view_index == (show_options - 1) + 2:
                     exit(0)
                 elif view_index == (show_options - 1) + 1:
+                    location = None  # clear location I got from command line
                     next_state = States.SEARCH
                 else:
                     votes = self.d.get_votes_by_city_id(int(options.iloc[view_index]["city_id"]))
@@ -156,5 +160,6 @@ class App:
                 elif index == 1:
                     next_state = States.UPDATE_DATA
                 elif index == 0:
+                    location = None  # clear location I got from command line
                     next_state = States.SEARCH
             current_state = next_state
