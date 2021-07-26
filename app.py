@@ -14,6 +14,11 @@ from main import data
 class App:
 
     def run(self, location=None):
+        """
+        Run election's grapher final state machine.
+        :param location: [optional] location entered by a command line argument
+        :return: None
+        """
 
         # Final state machine
         # type in place / receive in an argument
