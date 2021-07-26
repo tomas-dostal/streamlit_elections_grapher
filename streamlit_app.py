@@ -23,7 +23,6 @@ search_clicked = st.button("OK")
 if search_clicked or textbox:
 
     options = data.find_places_by_name(textbox)
-    print(options)
     options_str = ["{} [{}]".format(options.iloc[i]["city_name"], options.iloc[i]["district_name"]) for i in
                    range(len(options))]
 
