@@ -1,13 +1,14 @@
-import os
 import datetime
-from data import Data
-from data import PARTIES
+
 from simple_term_menu import TerminalMenu
 from termgraph import termgraph as tg
-from helper import map_range_from_to
-from helper import get_terminal_size
+
+from data import PARTIES
 from helper import States
 from helper import clear
+from helper import get_terminal_size
+from helper import map_range_from_to
+from main import data
 
 
 class App:

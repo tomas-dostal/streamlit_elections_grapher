@@ -1,7 +1,8 @@
 import plotly.express as px
+import streamlit as st
 
-import streamlitApp as st
 from data import *
+from main import data
 
 
 class streamlitApp:
