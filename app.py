@@ -27,7 +27,9 @@ class App:
         #   - return to start
         #   - exit
 
-
+        options = []
+        offset = 0
+        place = None
         current_state = States.UPDATE_DATA
         next_state = States.SEARCH
 
@@ -79,11 +81,13 @@ class App:
                 print("Viewing elections results in {} [{}]".format(votes.iloc[0]["city_name"],
                                                                     votes.iloc[0]["district_name"]))
                 print("------------------------------------")
-                # change to parties names
+
+                # It might be done something like that, the problem is that it does not work properly,
+                # possibly a used library limitation
+
                 involved_parties_color = [
                     int(x) + 80 for x in list(votes["party"])]
-                involved_parties = votes["party"].replace(
-                    PARTIES)  # replace ID by NAME
+                involved_parties = votes["party"].replace(PARTIES)  # replace ID by NAME
                 labels = list(involved_parties)
 
                 percents = [float(x)
@@ -137,9 +141,12 @@ class App:
                 print("Multiple possibilities for input '{}', please specify: ".format(place))
                 show_options = min(len(options), 15)
 
-                options_str = ["{} [{}]"
-                                   .format(options.iloc[i]["city_name"], options.iloc[i]["district_name"]) for i in
-                               range(offset + 0, min(offset + show_options, len(options)))] + ["|= More", "|= Search again", "|= Exit"]
+                options_str = ["{} [{}]".format(
+                    options.iloc[i]["city_name"],
+                    options.iloc[i]["district_name"]) for i in
+                                  range(offset + 0,
+                                        min(offset + show_options, len(options)))
+                              ] + ["|= More", "|= Search again", "|= Exit"]
 
                 multiple_options = TerminalMenu(
                     options_str

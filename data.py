@@ -37,16 +37,18 @@ class Data:
         print("Downloading data...")
 
         pool = ThreadPool(processes=32)
-        # launching multiple evaluations asynchronously may use more processes
         multiple_results = [pool.apply_async(
             Data.__fetch_data, (self, nuts)) for nuts in NUTS]
-        [self.__add_to_dataframe(res.get(timeout=10))
-         for res in multiple_results]
+        [self.__add_to_dataframe(res.get(timeout=10)) for res in multiple_results]
 
         print("\n{} entries imported".format(len(self.df)))
 
+    def get_progress(self):
+        return "{} / {} downloaded".format(self.downloaded, self.to_download)
+
     def __add_to_dataframe(self, x):
         print("#", end="")
+        self.downloaded += 1
         self.df = self.df.append(x)
 
     def __fetch_data(self, nuts):
@@ -98,5 +100,5 @@ class Data:
 
         return options
 
-    def get_votes_by_city_id(self, id):
-        return self.df.loc[self.df['city_id'] == str(id)]
+    def get_votes_by_city_id(self, city_id):
+        return self.df.loc[self.df['city_id'] == str(city_id)]
