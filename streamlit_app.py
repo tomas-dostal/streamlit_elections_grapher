@@ -1,6 +1,8 @@
-import streamlit as st
-from data import *
 import plotly.express as px
+import streamlit as st
+
+from data import *
+from main import data
 
 
 def local_css(file_name):
@@ -10,11 +12,16 @@ def local_css(file_name):
 
 local_css("style.css")
 
+st.title("Streamlit elections graphs")
+st.caption("Task from the Prusa Research")
+
+st.text("Please enter the name of city/village.")
+
 textbox = st.text_input("", "Search...")
 
 search_clicked = st.button("OK")
 if search_clicked or textbox:
-    data = Data()
+
     options = data.find_places_by_name(textbox)
     print(options)
     options_str = ["{} [{}]".format(options.iloc[i]["city_name"], options.iloc[i]["district_name"]) for i in
@@ -23,7 +30,6 @@ if search_clicked or textbox:
     selected_place = st.selectbox("Multiple options available, please select:",
                                   options_str)
     if selected_place:
-
         index_selected = options_str.index(selected_place)
 
         votes = data.get_votes_by_city_id(

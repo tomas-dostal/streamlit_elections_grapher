@@ -1,21 +1,31 @@
-import pandas as pd
-import xmltodict
-import requests
 from multiprocessing.pool import ThreadPool
+
+import pandas as pd
+import requests
+import xmltodict
+
 from helper import *
 
 
 class Data:
+
     def __init__(self):
 
         self.df = pd.DataFrame(data={})
         # https://volby.cz/pls/ps2017nss/vysledky_okres?nuts=CZ0806
-        self.update()
+        self.downloaded = 0
+        self.to_download = len(NUTS)
+        return
 
     # another approach would be having an index of what cities/towns are in NUTS and then
     # download only needed data.
 
     def update(self):
+        """
+        Overwrite existing data with new ones downloaded from volby.cz by __fetch_data().
+        Data is downloaded for all NUTS units separately due to the limitation on server site.
+        :return:
+        """
 
         # It there was a change, then without a diff it is cheaper (and much faster) to delete everything
         # and extract again.
@@ -31,19 +41,32 @@ class Data:
         print("Downloading data...")
 
         pool = ThreadPool(processes=32)
-        # launching multiple evaluations asynchronously may use more processes
         multiple_results = [pool.apply_async(
             Data.__fetch_data, (self, nuts)) for nuts in NUTS]
-        [self.__add_to_dataframe(res.get(timeout=10))
-         for res in multiple_results]
+        [self.__add_to_dataframe(res.get(timeout=10)) for res in multiple_results]
 
         print("\n{} entries imported".format(len(self.df)))
 
+    def get_progress(self):
+        return "{} / {} downloaded".format(self.downloaded, self.to_download)
+
     def __add_to_dataframe(self, x):
+        """
+        :param x:  Array of dictionaries with following keys: 'district_name', 'city_id', 'city_name', 'party',
+                   'party_votes_percent', total_votes' [optional]
+        :return: Updates self.df pandas dataframe
+        """
         print("#", end="")
+        self.downloaded += 1
         self.df = self.df.append(x)
 
     def __fetch_data(self, nuts):
+        """
+        Download elections data from volby.cz based on selected NUTS (something between region and district) and extract
+        usedful data
+        :param nuts: something between region and district, e.g. "CZ0412", see nuts_dial.txt
+        :return: array[Dict of extracted data]
+        """
 
         url = "https://volby.cz/pls/ps2017nss/vysledky_okres?nuts={}".format(
             nuts)
@@ -79,10 +102,15 @@ class Data:
                     )
 
         os.remove(filename)
-        # need to add to pandas in the main thread
+        # need to add data to pandas in the main thread, otherwise it causes data loss
         return tmp_data
 
     def find_places_by_name(self, qu):
+        """
+        Find places by name from pandas dataframe
+        :param qu: Name of place, e.g. "Nová Ves" (case sensitive, uses diacritics)
+        :return: Array of results containing "city_id", "city_name", "district_name" if found, otherwise empty dataframe
+        """
         # qu = "nová ves"
         # todo: make it case insensitive
         res = self.df.loc[self.df['city_name'].str.startswith(qu)]
@@ -92,5 +120,5 @@ class Data:
 
         return options
 
-    def get_votes_by_city_id(self, id):
-        return self.df.loc[self.df['city_id'] == str(id)]
+    def get_votes_by_city_id(self, city_id):
+        return self.df.loc[self.df['city_id'] == str(city_id)]
