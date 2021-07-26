@@ -24,10 +24,35 @@ This is my solution of a task from Prusa Research job interview. It is not perfe
 - Fetching all the data on the start of the app (not ideal, takes some time to run, but then searching is very fast)
 - Able to manage similar named places (e.g. 'Nová Ves') and let user select the right one
 
-#### Command line interface
-- Place could be passed as ```--place=Praha``` argument (case sensitive, search with diacritics) or typed down to the CLI interface (using [simple term menu](https://pypi.org/project/simple-term-menu/)) 
-- Plotting the graph using termgraph. Spent a lot of time here, it's more complicated than plot it using plotly (at least for me). 
-#### Web interface using [streamlit](https://streamlit.io/)
+### Command line interface
+- Place could be passed as ```--place=Praha``` argument (case sensitive, search with diacritics) or typed down to the CLI interface (using [simple term menu](https://pypi.org/project/simple-term-menu/))
+
+![Select place from multiple options](screenshots/cli_multiple_options.png) 
+
+- Plotting the graph using termgraph. Spent a lot of time here, it's more complicated than plot it using plotly (at least for me).
+
+![Plot grapth](screenshots/cli_view_graph.png) 
+ 
+### Web interface using [streamlit](https://streamlit.io/)
 - Running in a web browser, looks better, more intuitive
+- Can select from selectbox when multiple options available
+
+![Select place from multiple options](screenshots/streamlit_select_place.png) 
+
 - Plotting graph using plotly 
 
+![Plot grapth](screenshots/streamlit_view_graph.png) 
+
+
+# Installation
+
+1) Clone/download (and unzip) this repo to your computer
+2) Open terminal and navigate to the directory where you clonned/extracted the repo 
+3) execute ```pip install -r requirements.txt``` to install dependences
+
+# Run 
+
+```python
+python ./main.py                 # for command line version 
+python ./main.py --streamlit     # for web version 
+```
