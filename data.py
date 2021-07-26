@@ -38,14 +38,14 @@ class Data:
         # ~ 2.717305s - with multithreading
         # ~ 18.856571s - without multithreading
         # still very slow though
-        print("Downloading data...")
+        # print("Downloading data...")
 
         pool = ThreadPool(processes=32)
         multiple_results = [pool.apply_async(
             Data.__fetch_data, (self, nuts)) for nuts in NUTS]
         [self.__add_to_dataframe(res.get(timeout=10)) for res in multiple_results]
 
-        print("\n{} entries imported".format(len(self.df)))
+        #print("\n{} entries imported".format(len(self.df)))
 
     def get_progress(self):
         return "{} / {} downloaded".format(self.downloaded, self.to_download)
@@ -56,7 +56,7 @@ class Data:
                    'party_votes_percent', total_votes' [optional]
         :return: Updates self.df pandas dataframe
         """
-        print("#", end="")
+        # print("#", end="")
         self.downloaded += 1
         self.df = self.df.append(x)
 
