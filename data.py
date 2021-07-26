@@ -15,7 +15,6 @@ class Data:
         # https://volby.cz/pls/ps2017nss/vysledky_okres?nuts=CZ0806
         self.downloaded = 0
         self.to_download = len(NUTS)
-        print("Data.update __init___")
         return
 
     # another approach would be having an index of what cities/towns are in NUTS and then

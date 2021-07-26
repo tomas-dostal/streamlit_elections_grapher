@@ -23,6 +23,7 @@ from data import Data
 
 # init it here to prevent object creating every time a streamlit app window is refreshed
 data = Data()
+data.update()
 
 
 def main(args):
