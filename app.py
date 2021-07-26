@@ -12,9 +12,6 @@ from main import data
 
 
 class App:
-    def __init__(self):
-        # insert name of the place
-        pass
 
     def run(self, location=None):
 
@@ -45,7 +42,7 @@ class App:
                 else:
                     place = location  # parsed argument from command line
                 if place != '':
-                    options = self.d.find_places_by_name(place)
+                    options = data.find_places_by_name(place)
                     next_state = States.STATUS
                 else:
                     print("No input")
@@ -58,7 +55,7 @@ class App:
 
             elif current_state == States.UPDATE_DATA:
                 start = datetime.datetime.now()
-                self.d = Data()
+                data.update()
                 print(datetime.datetime.now() - start)
 
                 next_state = States.SEARCH
@@ -67,7 +64,7 @@ class App:
                 if len(options) > 1:
                     next_state = States.MULTIPLE_OPTIONS
                 elif len(options) == 1:
-                    votes = self.d.get_votes_by_city_id(
+                    votes = data.get_votes_by_city_id(
                         int(options["city_id"]))
                     if location:
                         next_state = States.MULTIPLE_OPTIONS
@@ -94,19 +91,20 @@ class App:
                 # no every party candidated in specific region.
                 # parties_names = map(PARTIES.get, place["party_id"].values.tolist())
                 # place["party/"]
-                data = [[x] for x in percents]
+                percents_data = [[x] for x in percents]
 
                 # let's scale graph according to the current width of terminal.
                 normal_data = [
-                    [map_range_from_to((x), 0, 100, 0, get_terminal_size())] for x in percents]
+                    [map_range_from_to(x, 0, 100, 0, get_terminal_size())] for x in percents]
                 len_categories = 1
+
+                # prepare graph plotting
                 args = {
                     'filenam': 'data/ex4.dat',
-                    'title': "Viewing elections results in {} [{}]".
-                        format(
+                    'title': "Viewing elections results in {} [{}]".format(
                         votes.iloc[0]["city_name"],
-                        votes.iloc[0]["district_name"]
-                    ), 'width': 80,
+                        votes.iloc[0]["district_name"]),
+                    'width': 80,
                     'format': '{:<5.2f}',
                     'suffix': '',
                     'no_labels': False,
@@ -121,13 +119,14 @@ class App:
                     'verbose': True,
                     'version': False
                 }
-                tg.stacked_graph(labels, data, normal_data,
+                tg.stacked_graph(labels, percents_data, normal_data,
                                  len_categories, args, involved_parties_color)
 
                 multiple_options = TerminalMenu(
                     ["Search again", "Exit"]
                 )
                 view_index = multiple_options.show()
+
                 if view_index == 1:
                     exit(0)
                 elif view_index == 0:
@@ -152,11 +151,11 @@ class App:
                     location = None  # clear location I got from command line
                     next_state = States.SEARCH
                 elif view_index == (show_options - 1) + 1:  # move to "next page"
-                    if(offset + show_options) < len(options):
+                    if (offset + show_options) < len(options):
                         offset += show_options
                     next_state = States.MULTIPLE_OPTIONS
                 else:
-                    votes = self.d.get_votes_by_city_id(
+                    votes = data.get_votes_by_city_id(
                         int(options.iloc[view_index]["city_id"]))
                     next_state = States.VIEW_GRAPH
 

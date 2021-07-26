@@ -18,22 +18,18 @@ class streamlitApp:
         textbox = st.text_input("", "Search...")
         search_clicked = st.button("OK")
 
-        if not search_clicked or not textbox:
-            return
-
-        data = Data()
-        options = data.find_places_by_name(textbox)
-        print(options)
-        options_str = ["{} [{}]".format(options.iloc[i]["city_name"], options.iloc[i]["district_name"]) for i in
-                       range(len(options))]
+    options = data.find_places_by_name(textbox)
+    print(options)
+    options_str = ["{} [{}]".format(options.iloc[i]["city_name"], options.iloc[i]["district_name"]) for i in
+                   range(len(options))]
 
         selected_place = st.selectbox("Multiple options available, please select:",
                                       options_str)
         if selected_place:
             index_selected = options_str.index(selected_place)
 
-            votes = data.get_votes_by_city_id(
-                int(options.iloc[index_selected]["city_id"]))
+        votes = data.get_votes_by_city_id(
+            int(options.iloc[index_selected]["city_id"]))
 
             involved_parties = votes["party"].replace(
                 PARTIES)  # replace ID by NAME

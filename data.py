@@ -8,11 +8,15 @@ from helper import *
 
 
 class Data:
+
     def __init__(self):
 
         self.df = pd.DataFrame(data={})
         # https://volby.cz/pls/ps2017nss/vysledky_okres?nuts=CZ0806
-        self.update()
+        self.downloaded = 0
+        self.to_download = len(NUTS)
+        print("Data.update __init___")
+        return
 
     # another approach would be having an index of what cities/towns are in NUTS and then
     # download only needed data.
@@ -81,7 +85,7 @@ class Data:
                     )
 
         os.remove(filename)
-        # need to add to pandas in the main thread
+        # need to add data to pandas in the main thread, otherwise it causes data loss
         return tmp_data
 
     def find_places_by_name(self, qu):
